@@ -29,11 +29,13 @@ System 1 是快速直觉判断，System 2 是慢速推理。LLM 擅长 System 2�
 # 1. 拿 key: https://console.typesafe.ai/keys -> Create key
 echo 'TYPESAFE_API_KEY=apikey_xxx' > .env
 
-# 2. 装 SDK（需要 Python >= 3.10）
-uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python typesafe-sdk
+# 2. 装依赖（需要 Python >= 3.10）
+uv venv --python 3.12 .venv
+uv pip install --python .venv/bin/python -r requirements.txt
 
 # 3. 跑
 .venv/bin/python demo/jev_lite.py
+bash demo/run_all.sh          # 或者全部跑一遍
 ```
 
 最小 HTTP 调用 —— **整个 API 只有这一个端点**：

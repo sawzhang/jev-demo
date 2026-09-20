@@ -60,8 +60,11 @@ QUESTIONS = {
 }
 
 
-def triage(ticket: str) -> dict:
-    """把 Jev 的答案交给普通 Python 控制流 —— 决策逻辑始终在你的代码里。"""
+def triage(ticket: str) -> tuple[dict, dict]:
+    """把 Jev 的答案交给普通 Python 控制流 —— 决策逻辑始终在你的代码里。
+
+    返回 (plan, answers)：plan 是路由决策，answers 是 Jev 的原始答案（便于打印/调试）。
+    """
     r = client.system_one(state=ticket, questions=QUESTIONS)
     a = r.answers
     cat = a["category"]

@@ -1,0 +1,5 @@
+# Python >= 3.10
+typesafe-sdk>=0.7.0
+
+# 仅当本机走 SOCKS 代理时需要（否则 SDK 底层 httpx 会报 ImportError: socksio）
+socksio>=1.0.0

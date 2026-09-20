@@ -19,6 +19,9 @@ client = TypeSafeClient()
 
 QUERY = "How do I rotate an API key without downtime?"
 
+# 保留阈值：score >= 1.5 才送进生成模型（介于「同话题但没回答」和「部分回答」之间）
+KEEP_ABOVE = 1.5
+
 PASSAGES = [
     "API keys are organization-scoped and remain active even after the creator is removed.",
     "To rotate without downtime, create a second key, deploy it to all services, verify traffic "
@@ -40,7 +43,7 @@ RUBRIC = [
 ]
 
 
-def rerank(query: str, passages: list[str], keep_above: float = 1.5):
+def rerank(query: str, passages: list[str], keep_above: float = KEEP_ABOVE):
     # 一次调用，N 个问题。state 里带上 query，让每个问题都能引用它。
     questions = {
         f"p{i}": Score(
@@ -64,7 +67,7 @@ if __name__ == "__main__":
     ranked, kept, usage = rerank(QUERY, PASSAGES)
     print(f"QUERY: {QUERY}\n")
     for s, conf, p in ranked:
-        mark = "KEEP" if s >= 1.5 else "drop"
+        mark = "KEEP" if s >= KEEP_ABOVE else "drop"
         print(f"  [{mark}] {s:4.2f} (conf {conf:4.2f})  {p[:76]}")
     print(f"\n{len(PASSAGES)} 段候选 -> 保留 {len(kept)} 段送进生成模型")
     print(f"1 次 API 调用, {usage.input_tokens} input tokens ≈ ${usage.input_tokens * 0.042 / 1e6:.8f}")
