@@ -180,6 +180,13 @@ bash demo/run_all.sh          # 全部跑一遍
 
 ---
 
+## 学习报告（HTML）
+
+[`report.html`](report.html) —— 单页版学习报告，可直接用浏览器打开或分享。
+在线版：https://claude.ai/artifact/HJPgasFDV8m6xtXcv7ZaeL （私有链接，需自行分享）
+
+---
+
 ## 文档索引
 
 - [01 · 核心概念](docs/01-concepts.md) —— System One vs LLM，state 怎么组织

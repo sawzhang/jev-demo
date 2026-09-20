@@ -1,0 +1,661 @@
+<title>Jev 实测笔记</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F4F6; --surface:#FFFFFF; --surface-2:#E7EDF1;
+  --ink:#101F29; --ink-2:#33474F; --muted:#627883;
+  --line:#D5DDE2; --line-strong:#B6C3CB;
+  --accent:#14618F; --accent-soft:#DBEAF3; --accent-dim:#8FB8D1;
+  --pass:#2F7550; --fail:#AE3A2A; --warn:#8C6410;
+  --shadow:0 1px 2px rgba(16,31,41,.05), 0 10px 28px -18px rgba(16,31,41,.35);
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"Source Serif 4",Georgia,"Songti SC",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --measure:38rem; --wide:60rem;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0B1317; --surface:#121D23; --surface-2:#19262D;
+    --ink:#DFE8ED; --ink-2:#B1C2CB; --muted:#889CA7;
+    --line:#233238; --line-strong:#35494F;
+    --accent:#63ACDA; --accent-soft:#12303F; --accent-dim:#3F7492;
+    --pass:#57B385; --fail:#E4785F; --warn:#D3A53E;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0B1317; --surface:#121D23; --surface-2:#19262D;
+  --ink:#DFE8ED; --ink-2:#B1C2CB; --muted:#889CA7;
+  --line:#233238; --line-strong:#35494F;
+  --accent:#63ACDA; --accent-soft:#12303F; --accent-dim:#3F7492;
+  --pass:#57B385; --fail:#E4785F; --warn:#D3A53E;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--body); font-size:1.0625rem; line-height:1.72;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:var(--wide); margin:0 auto; padding-inline:20px; padding-block:0}
+.col{max-width:var(--measure)}
+p{margin:0 0 1.05em}
+a{color:var(--accent); text-underline-offset:3px; text-decoration-thickness:1px}
+code{font-family:var(--mono); font-size:.86em; background:var(--surface-2); padding:.1em .38em; border-radius:3px}
+strong{font-weight:600}
+h1,h2,h3{font-family:var(--display); text-wrap:balance; margin:0}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+
+/* ---------- masthead ---------- */
+.masthead{border-bottom:1px solid var(--line); background:var(--surface)}
+.masthead .wrap{padding-block:clamp(2.6rem,7vw,4.2rem) clamp(1.8rem,4vw,2.6rem)}
+.kicker{
+  font-family:var(--mono); font-size:.72rem; font-weight:500; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--accent); margin:0 0 1.1rem
+}
+h1{font-size:clamp(2.15rem,6.2vw,3.15rem); font-weight:700; letter-spacing:-.022em; line-height:1.06}
+.standfirst{
+  font-size:clamp(1.02rem,2.4vw,1.17rem); color:var(--ink-2);
+  max-width:34rem; margin:1.1rem 0 0
+}
+.stamp{
+  display:flex; flex-wrap:wrap; gap:0 1.6rem; margin-top:2rem;
+  font-family:var(--mono); font-size:.76rem; color:var(--muted);
+  border-top:1px solid var(--line); padding-top:1rem
+}
+.stamp b{color:var(--ink); font-weight:500}
+
+/* ---------- sections ---------- */
+section{padding-block:clamp(2.6rem,6vw,4rem); border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:var(--mono); font-size:.7rem; font-weight:500; letter-spacing:.15em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 .7rem
+}
+h2{font-size:clamp(1.42rem,3.6vw,1.95rem); font-weight:600; letter-spacing:-.016em; line-height:1.2; margin-bottom:1.1rem}
+h3{font-size:1.02rem; font-weight:600; letter-spacing:-.004em; margin:2rem 0 .5rem}
+h3:first-of-type{margin-top:1.4rem}
+
+/* ---------- the thesis line ---------- */
+.thesis{
+  font-family:var(--display); font-weight:500; font-size:clamp(1.12rem,2.9vw,1.42rem);
+  line-height:1.42; letter-spacing:-.012em; color:var(--ink);
+  border-left:2px solid var(--accent); padding-left:1.1rem; margin:0 0 1.6rem; max-width:32rem
+}
+
+/* ---------- compare: two lanes ---------- */
+.lanes{display:grid; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden; margin:1.6rem 0}
+@media (min-width:620px){.lanes{grid-template-columns:1fr 1fr}}
+.lane{background:var(--surface); padding:1.15rem 1.25rem}
+.lane h4{font-family:var(--display); font-size:.82rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; margin:0 0 .75rem; color:var(--muted)}
+.lane.is-jev h4{color:var(--accent)}
+.lane ul{margin:0; padding:0; list-style:none; font-size:.94rem}
+.lane li{padding:.32rem 0; border-top:1px solid var(--line); color:var(--ink-2)}
+.lane li:first-child{border-top:0}
+.lane li b{color:var(--ink); font-weight:600; font-family:var(--display); font-size:.88rem}
+
+/* ---------- code ---------- */
+pre{
+  font-family:var(--mono); font-size:.78rem; line-height:1.62; margin:1.2rem 0;
+  background:var(--surface); color:var(--ink-2); border:1px solid var(--line);
+  border-radius:6px; padding:1rem 1.1rem; overflow-x:auto
+}
+pre code{background:none; padding:0; font-size:inherit}
+pre .c{color:var(--muted)}
+pre .k{color:var(--accent)}
+pre .n{color:var(--ink); font-weight:500}
+pre .bad{color:var(--fail)}
+pre .good{color:var(--pass)}
+
+/* ---------- distribution bars: the signature ---------- */
+.dist{
+  font-family:var(--mono); background:var(--surface); border:1px solid var(--line);
+  border-radius:6px; padding:1rem 1.1rem; margin:1.2rem 0; box-shadow:var(--shadow)
+}
+.dist-head{
+  display:flex; flex-wrap:wrap; gap:.5rem 1rem; align-items:baseline;
+  font-size:.72rem; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--muted); border-bottom:1px solid var(--line); padding-bottom:.6rem; margin-bottom:.75rem
+}
+.dist-head .q{color:var(--ink); text-transform:none; letter-spacing:0; font-size:.8rem; font-weight:500}
+.dist-row{display:grid; grid-template-columns:minmax(4.5rem,9rem) 1fr 2.6rem; gap:.65rem; align-items:center; padding:.16rem 0}
+.dist-k{font-size:.76rem; color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.dist-bar{height:9px; background:var(--surface-2); border-radius:2px; overflow:hidden}
+.dist-bar i{display:block; height:100%; background:var(--accent-dim); border-radius:2px}
+.dist-row.top .dist-k{color:var(--ink); font-weight:600}
+.dist-row.top .dist-bar i{background:var(--accent)}
+.dist-v{font-size:.76rem; text-align:right; font-variant-numeric:tabular-nums; color:var(--ink-2)}
+.dist-row.top .dist-v{color:var(--ink); font-weight:600}
+.dist-foot{
+  margin-top:.8rem; padding-top:.65rem; border-top:1px solid var(--line);
+  font-size:.75rem; color:var(--muted); display:flex; flex-wrap:wrap; gap:.3rem 1.2rem
+}
+.dist-foot b{color:var(--ink); font-weight:500; font-variant-numeric:tabular-nums}
+.dist-note{font-family:var(--body); font-size:.88rem; color:var(--ink-2); margin:.6rem 0 0; line-height:1.55}
+
+/* ---------- tables ---------- */
+.scroll{overflow-x:auto; margin:1.4rem 0; border:1px solid var(--line); border-radius:6px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-family:var(--mono); font-size:.79rem}
+th,td{padding:.6rem .85rem; text-align:left; border-top:1px solid var(--line); white-space:nowrap}
+thead th{
+  border-top:0; border-bottom:1px solid var(--line-strong); background:var(--surface-2);
+  font-weight:500; font-size:.69rem; letter-spacing:.11em; text-transform:uppercase; color:var(--muted)
+}
+td.num{text-align:right; font-variant-numeric:tabular-nums}
+tbody tr:hover{background:var(--surface-2)}
+td.subj{white-space:normal; min-width:11rem; color:var(--ink)}
+.verdict{font-size:.68rem; font-weight:600; letter-spacing:.09em; padding:.14rem .45rem; border-radius:3px}
+.verdict.pass{color:var(--pass); background:color-mix(in srgb, var(--pass) 12%, transparent)}
+.verdict.fail{color:var(--fail); background:color-mix(in srgb, var(--fail) 14%, transparent)}
+.verdict.warn{color:var(--warn); background:color-mix(in srgb, var(--warn) 14%, transparent)}
+tr.is-fail td{background:color-mix(in srgb, var(--fail) 5%, transparent)}
+tr.is-fail td.subj{font-weight:600}
+
+/* inline bar cells for the fan-out table */
+.cell-bar{display:flex; align-items:center; gap:.5rem; min-width:9rem}
+.cell-bar span{flex:0 0 3.1rem; text-align:right; font-variant-numeric:tabular-nums; color:var(--ink)}
+.cell-bar i{display:block; height:8px; border-radius:2px; background:var(--accent-dim)}
+.cell-bar.cost i{background:var(--warn); opacity:.75}
+
+/* ---------- takeaway callout ---------- */
+.takeaway{
+  background:var(--accent-soft); border:1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  border-radius:6px; padding:1.05rem 1.2rem; margin:1.5rem 0
+}
+.takeaway p{margin:0; font-size:.97rem; color:var(--ink)}
+.takeaway p + p{margin-top:.6rem}
+.takeaway .lbl{
+  font-family:var(--mono); font-size:.68rem; font-weight:600; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--accent); display:block; margin-bottom:.4rem
+}
+
+/* ---------- primitives ---------- */
+.prims{display:grid; gap:1rem; margin:1.6rem 0}
+@media (min-width:760px){.prims{grid-template-columns:repeat(3,1fr)}}
+.prim{background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:1.05rem 1.15rem; display:flex; flex-direction:column}
+.prim h3{margin:0 0 .15rem; font-size:1.05rem; font-family:var(--mono); font-weight:600; color:var(--accent)}
+.prim .ask{font-size:.9rem; color:var(--ink-2); margin:0 0 .85rem; min-height:2.8em}
+.prim dl{margin:0; font-family:var(--mono); font-size:.74rem; border-top:1px solid var(--line); padding-top:.7rem}
+.prim dt{color:var(--muted); letter-spacing:.06em; text-transform:uppercase; font-size:.66rem; margin-top:.55rem}
+.prim dt:first-child{margin-top:0}
+.prim dd{margin:.12rem 0 0; color:var(--ink-2); line-height:1.5}
+
+/* ---------- pipeline ---------- */
+.pipe{font-family:var(--mono); font-size:.78rem; margin:1.5rem 0; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--surface)}
+.pipe-row{display:grid; grid-template-columns:4.6rem 1fr auto; gap:.8rem; align-items:baseline; padding:.62rem .9rem; border-top:1px solid var(--line)}
+.pipe-row:first-child{border-top:0}
+.pipe-row.jev{background:var(--accent-soft)}
+.pipe-who{font-weight:600; font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+.pipe-row.jev .pipe-who{color:var(--accent)}
+.pipe-row.llm .pipe-who{color:var(--warn)}
+.pipe-what{color:var(--ink-2); white-space:normal}
+.pipe-cost{font-variant-numeric:tabular-nums; color:var(--ink); font-size:.74rem; text-align:right}
+@media (max-width:480px){
+  .pipe-row{grid-template-columns:1fr auto; }
+  .pipe-who{grid-column:1/-1}
+}
+
+/* ---------- files ---------- */
+.files{list-style:none; margin:1.4rem 0 0; padding:0; border-top:1px solid var(--line)}
+.files li{display:grid; grid-template-columns:minmax(0,13rem) 1fr; gap:.3rem 1.1rem; padding:.7rem 0; border-bottom:1px solid var(--line); align-items:baseline}
+.files code{background:none; padding:0; color:var(--accent); font-size:.8rem; font-weight:500; overflow-wrap:anywhere}
+.files span{font-size:.93rem; color:var(--ink-2)}
+@media (max-width:560px){.files li{grid-template-columns:1fr}}
+
+/* ---------- footer ---------- */
+footer{padding-block:2.4rem 3rem; color:var(--muted); font-family:var(--mono); font-size:.75rem}
+footer a{color:var(--muted)}
+footer .links{display:flex; flex-wrap:wrap; gap:.4rem 1.3rem; margin-bottom:1.1rem}
+footer .fine{max-width:34rem; line-height:1.65}
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="kicker">TypeSafe · System One</p>
+    <h1>Jev 实测笔记</h1>
+    <p class="standfirst">
+      一个不生成文本的模型。给它材料和带类型的问题，它还你带概率的判断 —— 
+      下面是把它跑穿之后，值得记住的东西。
+    </p>
+    <div class="stamp">
+      <div>模型 <b>jev-1.13.0</b></div>
+      <div>日期 <b>2026-09-20</b></div>
+      <div>请求 <b>60</b></div>
+      <div>tokens <b>38,931</b></div>
+      <div>总花费 <b>$0.0014</b></div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="col">
+      <p class="eyebrow">它是什么</p>
+      <h2>它不是便宜版 GPT，它替代的是 <code>if</code></h2>
+      <p class="thesis">LLM 把文本变成文本，你再写解析器去猜结构。Jev 把文本变成<b>类型</b>，答案空间由你定义。</p>
+      <p>
+        TypeSafe 管这叫 <b>System One 模型</b> —— 取自 Kahneman 的双系统理论。System 2 是慢速推理，
+        LLM 的主场；System 1 是快速直觉判断：「这条工单是不是投诉？」「这段话的语气多冲？」
+      </p>
+      <p>
+        绝大多数软件真正需要的是后者：一个<b>能直接喂给 <code>if</code> 的判断</b>。
+        但今天大家都在用 System 2 的模型干 System 1 的活 —— 求 GPT 吐一段 JSON，
+        然后解析、校验、处理幻觉、处理格式漂移、重试。Jev 把这一层整个砍掉了。
+      </p>
+    </div>
+
+    <div class="lanes">
+      <div class="lane is-jev">
+        <h4>Jev（System One）</h4>
+        <ul>
+          <li><b>输出</b> 类型化、受约束</li>
+          <li><b>答案空间</b> 你定义，模型只能从中选</li>
+          <li><b>概率</b> 针对真实结果标定过</li>
+          <li><b>延迟</b> 实测 0.5s 量级，与问题数几乎无关</li>
+          <li><b>计价</b> $0.042 / 百万 input，output 免费</li>
+          <li><b>做不到</b> 写任何一个字的自由文本</li>
+        </ul>
+      </div>
+      <div class="lane">
+        <h4>LLM（System Two）</h4>
+        <ul>
+          <li><b>输出</b> 自由文本</li>
+          <li><b>答案空间</b> 开放，靠 prompt 约束</li>
+          <li><b>概率</b> 未针对准确度标定</li>
+          <li><b>延迟</b> 随输出长度线性增长</li>
+          <li><b>计价</b> input + output 都计费</li>
+          <li><b>做不到</b> 结构上保证合法</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col">
+      <p>
+        「答案空间由你定义」是<b>结构性</b>的，不是概率性的：Choice 只能返回你给过的某个 key，
+        <b>不可能</b>返回一个你没写过的字符串。这和「我用 prompt 求 LLM 只返回这几个词」有本质区别。
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="col">
+      <p class="eyebrow">一次请求</p>
+      <h2>整个 API 只有一个端点</h2>
+      <p>
+        <code>POST /v1/systemone</code>。三件套：<b>state</b>（要评估的材料）、
+        <b>questions</b>（要做的判断，每个带类型和答案空间）、<b>model</b>。
+        N 个问题对同一份 state 并行评估、互相独立。
+      </p>
+    </div>
+
+<pre><code><span class="c"># state 是材料，questions 是判断 —— 别把结论塞进 state</span>
+{
+  <span class="k">"model"</span>: <span class="n">"jev-latest"</span>,
+  <span class="k">"state"</span>: <span class="n">"My card was charged twice for invoice INV-9921."</span>,
+  <span class="k">"questions"</span>: {
+    <span class="k">"billing"</span>: {<span class="k">"type"</span>:<span class="n">"noul"</span>,   <span class="k">"instructions"</span>:<span class="n">"The message is about a billing problem."</span>},
+    <span class="k">"team"</span>:    {<span class="k">"type"</span>:<span class="n">"choice"</span>, <span class="k">"instructions"</span>:<span class="n">"Which team should handle this?"</span>,
+                 <span class="k">"criteria"</span>:{<span class="n">"billing"</span>:<span class="n">"Payments"</span>, <span class="n">"technical"</span>:<span class="n">"Bugs"</span>, <span class="n">"sales"</span>:<span class="n">"Pricing"</span>}},
+    <span class="k">"urgency"</span>: {<span class="k">"type"</span>:<span class="n">"score"</span>,  <span class="k">"instructions"</span>:<span class="n">"How urgent?"</span>,
+                 <span class="k">"criteria"</span>:[<span class="n">"can wait"</span>, <span class="n">"this week"</span>, <span class="n">"today"</span>, <span class="n">"right now"</span>]}
+  }
+}</code></pre>
+
+    <div class="col">
+      <p>
+        返回的不是一段需要解析的文本，而是三个可以直接进 <code>if</code> 的值。
+        其中 <code>urgency</code> 这一项最值得看：
+      </p>
+    </div>
+
+    <div class="dist">
+      <div class="dist-head">
+        <span>score</span><span class="q">urgency — 这事多急？</span>
+      </div>
+      <div class="dist-row"><span class="dist-k">0 · can wait</span><span class="dist-bar"><i style="width:4%"></i></span><span class="dist-v">0.04</span></div>
+      <div class="dist-row top"><span class="dist-k">1 · this week</span><span class="dist-bar"><i style="width:50%"></i></span><span class="dist-v">0.50</span></div>
+      <div class="dist-row"><span class="dist-k">2 · today</span><span class="dist-bar"><i style="width:43%"></i></span><span class="dist-v">0.43</span></div>
+      <div class="dist-row"><span class="dist-k">3 · right now</span><span class="dist-bar"><i style="width:3%"></i></span><span class="dist-v">0.03</span></div>
+      <div class="dist-foot"><span>score <b>1.45</b></span><span>confidence <b>0.48</b></span></div>
+      <p class="dist-note">
+        模型<b>如实告诉你它在两档之间摇摆</b>。<code>score</code> 是概率加权的期望值，
+        所以落在 1.45 —— 比「这周」急，比「今天」松。一个硬分类会丢掉这个信息。
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="col">
+      <p class="eyebrow">原语</p>
+      <h2>只有三种问题</h2>
+      <p>三种可以在同一次调用里混用。<b>要开关用 Noul，要分派用 Choice，要排序或比较用 Score。</b></p>
+    </div>
+
+    <div class="prims">
+      <div class="prim">
+        <h3>Noul</h3>
+        <p class="ask">「这句陈述是真的吗？」</p>
+        <dl>
+          <dt>criteria</dt><dd>可选，用来钉死 true / false 的边界</dd>
+          <dt>返回</dt><dd><code>noul</code>：0~1 概率</dd>
+          <dt>注意</dt><dd>没有单独的 confidence —— 概率本身就是信号。instructions 写陈述句，别写疑问句</dd>
+        </dl>
+      </div>
+      <div class="prim">
+        <h3>Choice</h3>
+        <p class="ask">「是哪一个？」无序选项里挑一个。</p>
+        <dl>
+          <dt>criteria</dt><dd>必填，≤ 255 项（实测 256 → HTTP 400）</dd>
+          <dt>返回</dt><dd><code>choice</code> + <code>probabilities</code> + <code>confidence</code></dd>
+          <dt>注意</dt><dd>永远留一个兜底选项。没有兜底，模型被迫在不合适的选项里硬选</dd>
+        </dl>
+      </div>
+      <div class="prim">
+        <h3>Score</h3>
+        <p class="ask">「在哪一档？」有序档位上打分。</p>
+        <dl>
+          <dt>criteria</dt><dd>有序数组，上限 10 档（11 → 400）</dd>
+          <dt>返回</dt><dd><code>score</code>（可落在档位之间）+ <code>legend</code> + 分布 + confidence</dd>
+          <dt>注意</dt><dd>档位描述要写可观察的特征，不要写程度副词</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="col">
+      <p>
+        实测一个彩蛋：<b>255 个选项里选出目标项，置信度仍然 1.0。</b>
+        大规模分类 —— 商品类目、技能目录、意图集 —— 是可行的。
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="col">
+      <p class="eyebrow">实测 · 第一课</p>
+      <h2>扇出几乎免费</h2>
+      <p>同一份 state，只改问题数量，跑出来是这样：</p>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>问题数</th>
+            <th>耗时</th>
+            <th>成本</th>
+            <th class="num">input</th>
+            <th class="num">output</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><div class="cell-bar"><span>0.53s</span><i style="width:66px"></i></div></td>
+            <td><div class="cell-bar cost"><span>$0.0000128</span><i style="width:28px"></i></div></td>
+            <td class="num">305</td><td class="num">21</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><div class="cell-bar"><span>0.46s</span><i style="width:57px"></i></div></td>
+            <td><div class="cell-bar cost"><span>$0.0000145</span><i style="width:32px"></i></div></td>
+            <td class="num">346</td><td class="num">72</td>
+          </tr>
+          <tr>
+            <td>12</td>
+            <td><div class="cell-bar"><span>0.40s</span><i style="width:50px"></i></div></td>
+            <td><div class="cell-bar cost"><span>$0.0000189</span><i style="width:41px"></i></div></td>
+            <td class="num">449</td><td class="num">210</td>
+          </tr>
+          <tr>
+            <td>40</td>
+            <td><div class="cell-bar"><span>0.52s</span><i style="width:65px"></i></div></td>
+            <td><div class="cell-bar cost"><span>$0.0000343</span><i style="width:75px"></i></div></td>
+            <td class="num">817</td><td class="num">714</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col">
+      <div class="takeaway">
+        <span class="lbl">这条决定了 Jev 的正确用法</span>
+        <p><b>40 倍问题量，延迟不变，成本只涨 2.7 倍。</b>
+        因为 state 只发一次，增量只有问题文本；而 output token 不计费。</p>
+        <p>所以正确姿势不是「先分类，再根据分类追问」，而是<b>把整棵决策树的所有问题一次问完</b>，
+        包括那些可能用不上的，让代码去挑哪些有意义 —— 官方管这叫<b>投机性扇出</b>。</p>
+      </div>
+
+      <p>
+        实际效果：工单分诊里一次问 8 个问题，其中 <code>bug_severity</code> 只在分类是 bug 时有意义，
+        <code>refund_requested</code> 只在分类是账单时有意义。全问，零额外往返。
+        横切标记（<code>frustration</code> / <code>legal_threat</code> / <code>deadline</code>）
+        不属于任何分支、对所有工单都适用 —— 扇出让这类全局标记变得几乎免费。
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="col">
+      <p class="eyebrow">实测 · 第二课</p>
+      <h2>官方列了 9 类弱点，实测只有 1 类真的翻车</h2>
+      <p>
+        官方的 model-jaggedness 页面列了九类失败模式，但没给任何量化数据。
+        逐条压测（真值 vs 模型输出）：
+      </p>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>场景</th><th>期望</th><th>实测</th><th>判定</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="subj">计数 17 项</td><td>17→高，16/18→低</td><td>0.99 / 0.01 / 0.01</td><td><span class="verdict pass">PASS</span></td></tr>
+          <tr class="is-fail"><td class="subj">日期窗口（让模型自己算天数）</td><td>≈0.0（实际 42 天 &gt; 30 天）</td><td>0.26 · 0.29 · 0.32</td><td><span class="verdict fail">FAIL</span></td></tr>
+          <tr><td class="subj">同题，代码先算好 days=42</td><td>≈1.0</td><td>0.99</td><td><span class="verdict pass">PASS</span></td></tr>
+          <tr><td class="subj">双重否定</td><td>≈1.0</td><td>0.92 – 0.93</td><td><span class="verdict pass">PASS</span></td></tr>
+          <tr><td class="subj">噪声淹没信号（夹在 240 句废话中）</td><td>与干净输入一致</td><td>auth(1.0) == auth(1.0)</td><td><span class="verdict pass">PASS</span></td></tr>
+          <tr><td class="subj">state 内提示注入</td><td>≈0.0</td><td>0.01</td><td><span class="verdict pass">PASS</span></td></tr>
+          <tr><td class="subj">P(x) + P(¬x)</td><td>不保证 = 1</td><td>0.02 + 0.97 = 0.99</td><td><span class="verdict pass">PASS</span></td></tr>
+          <tr><td class="subj">中文（非主力语言）</td><td>能判对</td><td>anger=2.95，类别=物流(1.0)</td><td><span class="verdict pass">PASS</span></td></tr>
+          <tr><td class="subj">数值接近（0.1452 vs 0.15）</td><td>≈1.0</td><td>0.86</td><td><span class="verdict warn">勉强</span></td></tr>
+          <tr><td class="subj">十六进制颜色接近</td><td>≈1.0</td><td>0.90</td><td><span class="verdict warn">勉强</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col">
+      <h3>日期这条，危险的不是答错</h3>
+      <p>
+        是<b>答成 0.26 这种模棱两可的值</b> —— 既不是「是」，也不是明确的「否」。
+        任何阈值都救不了你。跨三次运行稳定复现。
+      </p>
+    </div>
+
+<pre><code><span class="c"># 差 —— 让模型自己算日期差</span>
+Noul(<span class="n">"The return request is within the policy window."</span>)
+<span class="bad">-&gt; 0.26   错，而且模糊</span>
+
+<span class="c"># 好 —— 代码算好天数放进 state，模型只做判断</span>
+state = {..., <span class="k">"days_elapsed"</span>: 42, <span class="k">"policy_days"</span>: 30}
+Noul(<span class="n">"`days_elapsed` exceeds `policy_days`."</span>)
+<span class="good">-&gt; 0.99   干净</span>
+
+<span class="c"># 最好 —— 这题根本不该问模型</span>
+days_elapsed &gt; policy_days</code></pre>
+
+    <div class="col">
+      <div class="takeaway">
+        <span class="lbl">通用规则</span>
+        <p><b>算术在代码里做，判断才交给模型。</b>
+        分桶是判断（「大概过了多少天」→ 31to60，conf 0.97，模型行）；
+        算差值是算术（模型不行）。</p>
+      </div>
+      <p>
+        抗噪声和抗提示注入的表现<b>好于文档预期</b> —— 但官方原话是「不<b>默认</b>把数据当敌意输入」，
+        不是保证。生产环境仍需自己的纵深防御：用户内容放进 state 的具名字段，
+        而不是拼进 instructions。
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="col">
+      <p class="eyebrow">实测 · 第三课</p>
+      <h2>置信度是第二根轴</h2>
+      <p>
+        <code>choice</code> 告诉你<b>是什么</b>；<code>confidence</code> 告诉你<b>敢不敢自动执行</b>。
+        LLM 给不了你第二根轴 —— 它对着一个完全模糊的输入，也会用同样自信的语气给你一个答案。
+      </p>
+      <p>
+        阈值跟着<b>动作的风险</b>走，不跟着模型走。同一个系统里，查余额可以 0.6 放行，
+        批转账要 0.85 甚至要人确认。风险容忍度编码在你的代码里。
+      </p>
+
+      <h3>低置信度如实反映「多意图」</h3>
+      <p>自然语言转函数调用的 demo 里，这句话把置信度打到了 0.38：</p>
+    </div>
+
+    <div class="dist">
+      <div class="dist-head">
+        <span>choice</span><span class="q">“make the living room a bit warmer <b>and</b> dim the lights”</span>
+      </div>
+      <div class="dist-row top"><span class="dist-k">set_temperature</span><span class="dist-bar"><i style="width:48%"></i></span><span class="dist-v">0.48</span></div>
+      <div class="dist-row"><span class="dist-k">set_lights</span><span class="dist-bar"><i style="width:40%"></i></span><span class="dist-v">0.40</span></div>
+      <div class="dist-row"><span class="dist-k">play_music</span><span class="dist-bar"><i style="width:6%"></i></span><span class="dist-v">0.06</span></div>
+      <div class="dist-row"><span class="dist-k">其余三项</span><span class="dist-bar"><i style="width:6%"></i></span><span class="dist-v">0.06</span></div>
+      <div class="dist-foot"><span>confidence <b>0.38</b></span><span>→ 反问用户，不猜</span></div>
+      <p class="dist-note">
+        这是个<b>双动作</b>请求。模型没有硬选一个，而是把概率劈成两半。
+        生成式 function calling 通常会自信地只调一个工具。
+      </p>
+    </div>
+
+    <div class="col">
+      <p>
+        实践建议：配一个 <code>multi_step</code> 的 Noul 一起扇出，主动检测多动作并拆分请求，
+        而不是事后从 confidence 反推原因。低置信度有三种成因 ——
+        <b>输入本身模糊</b>（反问）、<b>多意图</b>（拆分）、<b>你的选项设计有重叠</b>（这是你的 bug）——
+        别一律当成「转人工」。
+      </p>
+
+      <h3>但 confidence 防「模糊」，不防「问错问题」</h3>
+      <p>同一个 demo 里的另一条，置信度 0.99，答案是错的：</p>
+    </div>
+
+<pre><code><span class="n">"lock up, I'm going to bed"</span>
+  <span class="bad">-&gt; lock_doors(room=bedroom)   confidence = 0.99</span>
+
+<span class="c"># 我问的是   : "Which room is mentioned?"        &lt;- bedroom 确实被提到了</span>
+<span class="c"># 我想问的是 : "动作发生在哪个房间"               &lt;- 模型没错，问题写错了</span></code></pre>
+
+    <div class="col">
+      <div class="takeaway">
+        <span class="lbl">字面理解 —— 实际开发里最高频的坑</span>
+        <p>Jev <b>回答你写的问题，不是你想问的问题</b>。
+        instructions 要写<b>精确的判定条件</b>，不是意图；边界情况直接写进 criteria 的
+        <code>not_for</code> / <code>examples</code>。</p>
+        <p>这类坑只有拿<b>真实样本回归测试</b>才会暴露 —— 压测表里看不见它。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="col">
+      <p class="eyebrow">落地</p>
+      <h2>它在生产链路里的位置</h2>
+      <p>
+        Jev 不替代 LLM，它在 LLM 前后各架一道便宜的闸门：
+        把不该进 LLM 的请求挡住、把 LLM 的输入收窄、把输出核对一遍。
+      </p>
+    </div>
+
+    <div class="pipe">
+      <div class="pipe-row jev"><span class="pipe-who">Jev</span><span class="pipe-what">护栏扇出 — 越狱 / PII / 越界 / 有害，5 道并行检查</span><span class="pipe-cost">0.5s · $0.00003</span></div>
+      <div class="pipe-row jev"><span class="pipe-who">Jev</span><span class="pipe-what">意图路由 + 枚举参数扇出，答案空间封闭</span><span class="pipe-cost">0.5s · $0.00003</span></div>
+      <div class="pipe-row"><span class="pipe-who">代码</span><span class="pipe-what">置信度达标 → 确定性 handler（查余额、改设置）根本不需要 LLM</span><span class="pipe-cost">—</span></div>
+      <div class="pipe-row"><span class="pipe-who">检索</span><span class="pipe-what">向量召回 20 段候选</span><span class="pipe-cost">—</span></div>
+      <div class="pipe-row jev"><span class="pipe-who">Jev</span><span class="pipe-what">重排 + 截断 — 相似度之上再加一层「是否真的回答了问题」</span><span class="pipe-cost">0.5s · $0.00005</span></div>
+      <div class="pipe-row llm"><span class="pipe-who">LLM</span><span class="pipe-what">拿着 2~3 段证据生成回复</span><span class="pipe-cost">~3s · $0.01</span></div>
+      <div class="pipe-row jev"><span class="pipe-who">Jev</span><span class="pipe-what">输出护栏 — 幻觉 / 引用核对 / 语气</span><span class="pipe-cost">0.5s · $0.00003</span></div>
+    </div>
+
+    <div class="col">
+      <p>
+        整条链路里 Jev 那四步加起来<b>不到 LLM 那一步成本的 1.5%</b>。
+      </p>
+
+      <h3>四种官方模式，一句话各自</h3>
+      <p>
+        <b>投机性扇出</b> —— 一次问完，代码挑。
+        <b>置信度闸门路由</b> —— 阈值按动作风险设。
+        <b>复合打分</b> —— 把复杂判断拆成原子分，权重放在你的代码里（可读、可调、可 A/B），
+        而不是让模型直接给总分。
+        <b>意图路由</b> —— 答案空间封闭，结构上不可能路由到不存在的 handler。
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="col">
+      <p class="eyebrow">仓库</p>
+      <h2>跑得起来的代码</h2>
+      <p>
+        <code>~/code/jev_demo</code> —— 六份文档、五个 demo、一份可复现压测。
+        <code>bash demo/run_all.sh</code> 全跑一遍。
+      </p>
+    </div>
+
+    <ul class="files">
+      <li><code>demo/jev_lite.py</code><span>零依赖客户端，60 行看清整个 API 只有一个 POST</span></li>
+      <li><code>demo/01_triage.py</code><span>工单分诊：8 问一次调用跑完整棵决策树，两道闸门分别处理「模型不确定」和「工单信息不足」</span></li>
+      <li><code>demo/02_guardrails.py</code><span>LLM 护栏：5 道并行检查，5 条对抗样本全部正确拦截</span></li>
+      <li><code>demo/03_semantic_rerank.py</code><span>RAG 重排：8 段候选一次打分，2.98 / 1.93 / 1.31 … 按阈值截断到 2 段</span></li>
+      <li><code>demo/04_function_calling.py</code><span>自然语言转函数调用，含本页那两个置信度案例</span></li>
+      <li><code>demo/05_benchmark.py</code><span>可复现压测：扇出扩展性 + 9 类弱点逐条 + 限额与错误边界</span></li>
+    </ul>
+
+    <div class="col">
+      <h3>两个踩坑提醒</h3>
+      <p>
+        本机若有 SOCKS 代理，官方 SDK 底层的 httpx 会报
+        <code>ImportError: socksio</code> —— 补装 <code>socksio</code> 即可。
+        另外文档说 Score 档位 2~10，实测<b>下限没有被服务端强制</b>（1 档也能通过），
+        只有上限 10 是硬限制。
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="links">
+      <a href="https://console.typesafe.ai">控制台</a>
+      <a href="https://docs.typesafe.ai">文档</a>
+      <a href="https://docs.typesafe.ai/llms.txt">llms.txt（喂给 agent）</a>
+      <a href="https://openrouter.ai/~typesafe/jev-latest">OpenRouter</a>
+    </div>
+    <p class="fine">
+      所有数字取自 2026-09-20 在 jev-1.13.0 上的实际调用，脚本可复现。
+      延迟为预热后数值 —— 首次调用含 TLS 握手约 1.9s。
+      beta 期速率限制动态调整，性能数据可能随版本变化。
+    </p>
+  </div>
+</footer>
