@@ -175,6 +175,27 @@ days_elapsed > policy_days
 | [`demo/03_semantic_rerank.py`](demo/03_semantic_rerank.py) | **RAG 重排**：8 段候选一次打分排序，向量相似度之上再加一层「是否真的回答了问题」 |
 | [`demo/04_function_calling.py`](demo/04_function_calling.py) | **NL → 函数调用**：答案空间封闭，结构上不可能幻觉出不存在的函数 |
 | [`demo/05_benchmark.py`](demo/05_benchmark.py) | 可复现实测：扇出扩展性 + 9 类已知弱点逐条压测 + 错误边界 |
+| [`demo/06_codex_file_selection.py`](demo/06_codex_file_selection.py) | Codex 前置文件筛选实验：对三个编码任务给项目文件打相关度分数，报告 Recall@3、Jev token 和送往 Codex 的文件字节比例 |
+
+### Codex 前置筛选实验（2026-09-22）
+
+```bash
+.venv/bin/python demo/06_codex_file_selection.py
+.venv/bin/python demo/06_codex_file_selection.py --preview-chars 1200
+.venv/bin/python demo/07_codex_context_ab.py
+```
+
+8 个候选文件、3 个手工标注任务。完整文件模式和每文件 1200 字符预览模式的
+Recall@3 均为 100%（共 5 个目标文件）；选中 3 个文件后，传给 Codex 的文件字节量
+为全部候选的 33%～49%。Jev 总 input tokens 分别为 43,389 和 16,329。
+只读 Codex A/B（单个日期窗口任务）也已运行：全部 8 文件模式使用 25,669 input tokens；
+Jev 所选 3 文件模式使用 20,347 input tokens（其中 11,520 为 cached input tokens）。
+后者使用完整文件筛选得到的候选；Jev 筛选另花 14,466 input tokens，
+所以两段合计 34,813，
+**这次没有证明总 token 更省**。两个答案也不等价：全部文件模式错误地建议放宽
+`v < 0.15` 判定，筛选模式正确建议先在 Python 中计算日期差。样本只有一题、
+运行顺序固定且有缓存差异，不能据此推断质量提升。文件字节比例也不能当成
+Codex token 节省。完整内容发给 Jev 筛选，在成本和数据边界上都需单独评估。
 
 ```bash
 bash demo/run_all.sh          # 全部跑一遍
