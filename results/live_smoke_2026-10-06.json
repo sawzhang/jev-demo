@@ -1,0 +1,117 @@
+{
+  "date": "2026-10-06",
+  "cases": [
+    {
+      "case": "english",
+      "elapsed_seconds": 0.632,
+      "model": "jev-1.13.0",
+      "answers": {
+        "intent": {
+          "type": "choice",
+          "choice": "refund",
+          "confidence": 1.0,
+          "probabilities": {
+            "refund": 1.0,
+            "question": 0.0,
+            "other": 0.0,
+            "repair": 0.0
+          }
+        },
+        "refund": {
+          "type": "noul",
+          "noul": 0.98
+        },
+        "clarity": {
+          "type": "score",
+          "score": 1.91,
+          "confidence": 0.87,
+          "legend": {
+            "0": "No identifiable request",
+            "1": "Identifiable but missing important details",
+            "2": "Clear request with sufficient details"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.09,
+            "2": 0.91
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 426,
+        "output_tokens": 76
+      }
+    },
+    {
+      "case": "chinese",
+      "elapsed_seconds": 0.568,
+      "model": "jev-1.13.0",
+      "answers": {
+        "intent": {
+          "type": "choice",
+          "choice": "repair",
+          "confidence": 0.98,
+          "probabilities": {
+            "question": 0.0,
+            "repair": 0.98,
+            "refund": 0.0,
+            "other": 0.02
+          }
+        },
+        "refund": {
+          "type": "noul",
+          "noul": 0.02
+        },
+        "clarity": {
+          "type": "score",
+          "score": 1.95,
+          "confidence": 0.92,
+          "legend": {
+            "0": "No identifiable request",
+            "1": "Identifiable but missing important details",
+            "2": "Clear request with sufficient details"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.05,
+            "2": 0.95
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 424,
+        "output_tokens": 76
+      }
+    },
+    {
+      "case": "date_raw",
+      "elapsed_seconds": 0.475,
+      "model": "jev-1.13.0",
+      "answers": {
+        "within_window": {
+          "type": "noul",
+          "noul": 0.03
+        }
+      },
+      "usage": {
+        "input_tokens": 322,
+        "output_tokens": 21
+      }
+    },
+    {
+      "case": "date_computed",
+      "elapsed_seconds": 0.467,
+      "model": "jev-1.13.0",
+      "answers": {
+        "within_window": {
+          "type": "noul",
+          "noul": 0.01
+        }
+      },
+      "usage": {
+        "input_tokens": 292,
+        "output_tokens": 21
+      }
+    }
+  ]
+}

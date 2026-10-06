@@ -228,3 +228,9 @@ bash demo/run_all.sh          # 全部跑一遍
 | 全文索引（喂给 agent 用） | https://docs.typesafe.ai/llms.txt |
 | Agent Skill | `claude plugin marketplace add typesafe-ai/skills` → `claude plugin install typesafe@typesafe-ai` |
 | 其他入口 | OpenRouter `~typesafe/jev-latest`、Vercel AI Gateway |
+
+## 智能体执行证据核验实验（2026-10-06）
+
+新增 [`demo/08_agent_evidence_judge.py`](demo/08_agent_evidence_judge.py)，将执行轨迹、后置状态与最终回答分开检查。10条合成运维案例、两版评分定义、共20次Jev请求；第二版40项二元判断与预设标签一致，但同样本调试不代表独立准确率，诚实失败案例仍进入灰区。
+
+见[探索报告](docs/07-agent-evidence-learning.md)。PASS仅代表回答评估通过，不代表任务完成；本轮未接入Opik。
